@@ -1,0 +1,1191 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>FunSwap Shop</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+    :root {
+      --bg: #0f0f0f;
+      --surface: #1a1a1a;
+      --surface2: #242424;
+      --surface3: #2e2e2e;
+      --accent: #f0b90b;
+      --accent2: #f0b90b22;
+      --text: #ffffff;
+      --text2: #888888;
+      --text3: #555555;
+      --success: #0ecb81;
+      --danger: #f6465d;
+      --border: #2a2a2a;
+      --radius: 12px;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      min-height: 100vh;
+      max-width: 480px;
+      margin: 0 auto;
+      padding-bottom: 70px;
+    }
+
+    /* TOP BAR */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px 10px;
+      position: sticky;
+      top: 0;
+      background: var(--bg);
+      z-index: 100;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .topbar-logo {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 0.5px;
+    }
+
+    .topbar-sub {
+      font-size: 11px;
+      color: var(--text2);
+      margin-top: 1px;
+    }
+
+    .topbar-badge {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 5px 12px;
+      font-size: 12px;
+      color: var(--text2);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .topbar-badge span { color: var(--success); font-weight: 600; }
+
+    /* BOTTOM NAV */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      max-width: 480px;
+      margin: 0 auto;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      display: flex;
+      z-index: 100;
+    }
+
+    .nav-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      padding: 10px 0 12px;
+      cursor: pointer;
+      color: var(--text3);
+      font-size: 10px;
+      transition: color 0.2s;
+    }
+
+    .nav-item.active { color: var(--accent); }
+    .nav-item svg { width: 22px; height: 22px; }
+
+    /* SCREENS */
+    .screen { display: none; }
+    .screen.active { display: block; animation: fadeUp 0.25s ease; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* SECTION */
+    .section { padding: 16px 16px 0; }
+
+    .section-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text2);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    /* NICK CARD */
+    .nick-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      margin-bottom: 10px;
+    }
+
+    .nick-label {
+      font-size: 11px;
+      color: var(--text2);
+      margin-bottom: 6px;
+      letter-spacing: 0.5px;
+    }
+
+    .nick-input {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 11px 14px;
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      font-weight: 500;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .nick-input:focus { border-color: var(--accent); }
+    .nick-input::placeholder { color: var(--text3); font-weight: 400; }
+    .nick-input.error { border-color: var(--danger); }
+
+    /* SERVER TAG */
+    .server-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 16px;
+    }
+
+    .server-label { font-size: 13px; color: var(--text2); }
+    .server-value {
+      background: var(--accent2);
+      border: 1px solid var(--accent);
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    /* CAT TABS */
+    .cat-tabs {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 0 16px 12px;
+      scrollbar-width: none;
+    }
+    .cat-tabs::-webkit-scrollbar { display: none; }
+
+    .cat-tab {
+      flex-shrink: 0;
+      padding: 7px 16px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text2);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .cat-tab.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #000;
+      font-weight: 700;
+    }
+
+    /* SERVICE LIST */
+    .service-list {
+      padding: 0 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+
+    .svc-item {
+      background: var(--surface);
+      padding: 14px 16px;
+      cursor: pointer;
+      transition: background 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      position: relative;
+    }
+
+    .svc-item:first-child { border-radius: var(--radius) var(--radius) 0 0; }
+    .svc-item:last-child  { border-radius: 0 0 var(--radius) var(--radius); }
+    .svc-item:only-child  { border-radius: var(--radius); }
+
+    .svc-item + .svc-item { border-top: 1px solid var(--border); }
+
+    .svc-item:active { background: var(--surface2); }
+
+    .svc-item.selected { background: var(--surface2); }
+    .svc-item.selected .svc-name { color: var(--accent); }
+
+    .svc-icon {
+      font-size: 24px;
+      width: 36px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .svc-info { flex: 1; min-width: 0; }
+
+    .svc-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      transition: color 0.2s;
+    }
+
+    .svc-desc {
+      font-size: 12px;
+      color: var(--text2);
+      margin-top: 2px;
+    }
+
+    .svc-right { text-align: right; flex-shrink: 0; }
+
+    .svc-price {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .svc-price-sub {
+      font-size: 11px;
+      color: var(--text2);
+      margin-top: 1px;
+    }
+
+    .svc-check {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      background: var(--accent);
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .svc-item.selected .svc-check { display: flex; }
+    .svc-item.selected .svc-right { padding-right: 28px; }
+
+    .svc-check svg { width: 12px; height: 12px; }
+
+    /* OPTIONS PANEL */
+    .options-panel {
+      margin: 10px 16px 0;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+      animation: fadeUp 0.2s ease;
+    }
+
+    .options-label {
+      font-size: 11px;
+      color: var(--text2);
+      letter-spacing: 0.5px;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+    }
+
+    .period-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .period-btn {
+      flex: 1;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 6px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .period-btn:active { opacity: 0.7; }
+
+    .period-btn.active {
+      border-color: var(--accent);
+      background: var(--accent2);
+    }
+
+    .period-btn.active .period-days { color: var(--accent); }
+
+    .period-days {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text2);
+    }
+
+    .period-price {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      margin-top: 3px;
+    }
+
+    /* QTY INPUT */
+    .qty-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .qty-input {
+      flex: 1;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 11px 14px;
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .qty-input:focus { border-color: var(--accent); }
+    .qty-input::placeholder { color: var(--text3); font-weight: 400; }
+
+    .qty-total {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--accent);
+      min-width: 80px;
+      text-align: right;
+    }
+
+    .qty-hint {
+      font-size: 11px;
+      color: var(--text2);
+      margin-bottom: 8px;
+    }
+
+    /* BOTTOM ACTION */
+    .bottom-action {
+      position: fixed;
+      bottom: 60px;
+      left: 0; right: 0;
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 12px 16px;
+      background: linear-gradient(to top, var(--bg) 70%, transparent);
+      z-index: 99;
+    }
+
+    .btn-main {
+      width: 100%;
+      padding: 15px;
+      border-radius: var(--radius);
+      border: none;
+      background: var(--accent);
+      color: #000;
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      letter-spacing: 0.3px;
+    }
+
+    .btn-main:active { transform: scale(0.98); opacity: 0.9; }
+    .btn-main:disabled { opacity: 0.3; cursor: not-allowed; transform: none; }
+
+    .btn-secondary {
+      width: 100%;
+      padding: 15px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text2);
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-secondary:active { background: var(--surface2); }
+
+    /* ORDER SCREEN */
+    .order-header {
+      padding: 16px 16px 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .back-btn {
+      width: 36px; height: 36px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .back-btn svg { width: 18px; height: 18px; }
+
+    .order-title {
+      font-size: 17px;
+      font-weight: 700;
+    }
+
+    /* INFO ROWS */
+    .info-card {
+      margin: 0 16px 10px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 13px 16px;
+    }
+
+    .info-row + .info-row { border-top: 1px solid var(--border); }
+
+    .info-row-label { font-size: 13px; color: var(--text2); }
+
+    .info-row-value {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      text-align: right;
+      max-width: 60%;
+    }
+
+    .info-row-value.accent { color: var(--accent); font-size: 16px; }
+    .info-row-value.success { color: var(--success); }
+
+    /* PAYMENT CARD */
+    .pay-card {
+      margin: 0 16px 10px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+    }
+
+    .pay-bank-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .pay-bank-icon {
+      width: 38px; height: 38px;
+      border-radius: 10px;
+      background: #1f1f1f;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .pay-bank-name { font-size: 14px; font-weight: 700; }
+    .pay-bank-sub  { font-size: 12px; color: var(--text2); margin-top: 1px; }
+
+    .card-num-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 11px 14px;
+      margin-bottom: 10px;
+    }
+
+    .card-num {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: var(--text);
+    }
+
+    .copy-btn {
+      background: var(--accent2);
+      border: 1px solid var(--accent);
+      border-radius: 6px;
+      padding: 5px 12px;
+      color: var(--accent);
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .copy-btn:active { opacity: 0.7; }
+
+    .amount-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 14px;
+      background: var(--surface2);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+
+    .amount-label { font-size: 12px; color: var(--text2); }
+
+    .amount-value {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    /* UPLOAD */
+    .upload-zone {
+      margin: 0 16px 10px;
+      background: var(--surface);
+      border: 2px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      position: relative;
+      transition: border-color 0.2s;
+    }
+
+    .upload-zone:hover, .upload-zone.has-file { border-color: var(--accent); }
+    .upload-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+
+    .upload-icon { font-size: 28px; margin-bottom: 6px; }
+    .upload-text { font-size: 14px; font-weight: 600; color: var(--text); }
+    .upload-sub  { font-size: 12px; color: var(--text2); margin-top: 3px; }
+
+    .receipt-img-preview {
+      display: none;
+      margin: -16px -16px 0;
+      overflow: hidden;
+      border-radius: var(--radius) var(--radius) 0 0;
+    }
+
+    .receipt-img-preview img { width: 100%; height: 120px; object-fit: cover; }
+
+    .receipt-file-preview {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      margin-top: 8px;
+      color: var(--success);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    /* WARNING BOX */
+    .warn-box {
+      margin: 0 16px 10px;
+      background: rgba(240,185,11,0.08);
+      border: 1px solid rgba(240,185,11,0.2);
+      border-radius: var(--radius);
+      padding: 12px 14px;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      font-size: 13px;
+      color: var(--text2);
+      line-height: 1.5;
+    }
+
+    .warn-icon { font-size: 16px; flex-shrink: 0; }
+
+    /* SUCCESS */
+    .success-wrap {
+      padding: 40px 24px 20px;
+      text-align: center;
+    }
+
+    .success-circle {
+      width: 72px; height: 72px;
+      border-radius: 50%;
+      background: rgba(14,203,129,0.12);
+      border: 2px solid var(--success);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 20px;
+      font-size: 32px;
+      animation: popIn 0.4s ease;
+    }
+
+    @keyframes popIn {
+      from { transform: scale(0.5); opacity: 0; }
+      to   { transform: scale(1);   opacity: 1; }
+    }
+
+    .success-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .success-desc {
+      font-size: 14px;
+      color: var(--text2);
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+
+    .order-num-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+      margin-bottom: 16px;
+    }
+
+    .order-num-label { font-size: 11px; color: var(--text2); letter-spacing: 1px; text-transform: uppercase; }
+    .order-num-value { font-size: 22px; font-weight: 700; color: var(--accent); margin-top: 4px; }
+
+    .contact-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+      margin-bottom: 20px;
+      font-size: 13px;
+      color: var(--text2);
+      line-height: 1.6;
+      text-align: left;
+      display: flex;
+      gap: 10px;
+    }
+
+    /* TOAST */
+    .toast {
+      position: fixed;
+      top: 16px; left: 50%;
+      transform: translateX(-50%);
+      background: var(--surface2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 9px 20px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      z-index: 1000;
+      white-space: nowrap;
+      animation: toastIn 0.3s ease, toastOut 0.3s ease 1.7s forwards;
+      pointer-events: none;
+    }
+
+    @keyframes toastIn  { from { opacity:0; top: 8px; } to { opacity:1; top:16px; } }
+    @keyframes toastOut { from { opacity:1; } to { opacity:0; } }
+
+    .spacer { height: 80px; }
+  </style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div>
+    <div class="topbar-logo">FunSwap</div>
+    <div class="topbar-sub">Донат магазин</div>
+  </div>
+  <div class="topbar-badge">⚔️ <span>Анархия</span></div>
+</div>
+
+<!-- ====== SCREEN 1: КАТАЛОГ ====== -->
+<div class="screen active" id="screenCatalog">
+
+  <!-- Ник -->
+  <div class="section" style="padding-top:14px">
+    <div class="section-title">Твой ник</div>
+    <div class="nick-card">
+      <div class="nick-label">Введи ник на сервере</div>
+      <input type="text" class="nick-input" id="nicknameInput" placeholder="Твой никнейм..." autocomplete="off" />
+    </div>
+  </div>
+
+  <!-- Категории -->
+  <div class="cat-tabs" id="catTabs"></div>
+
+  <!-- Список услуг -->
+  <div class="service-list" id="serviceList"></div>
+
+  <!-- Опции (период / кол-во) -->
+  <div id="serviceOptions" style="display:none"></div>
+
+  <div class="spacer"></div>
+</div>
+
+<!-- ====== SCREEN 2: ОПЛАТА ====== -->
+<div class="screen" id="screenPayment">
+
+  <div class="order-header">
+    <div class="back-btn" onclick="goBack()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+    </div>
+    <div class="order-title">Оформление заказа</div>
+  </div>
+
+  <!-- Заказ -->
+  <div class="info-card">
+    <div class="info-row">
+      <span class="info-row-label">Ник</span>
+      <span class="info-row-value" id="sumNick">—</span>
+    </div>
+    <div class="info-row">
+      <span class="info-row-label">Сервер</span>
+      <span class="info-row-value success">⚔️ Анархия</span>
+    </div>
+    <div class="info-row">
+      <span class="info-row-label">Услуга</span>
+      <span class="info-row-value" id="sumService">—</span>
+    </div>
+    <div class="info-row">
+      <span class="info-row-label">К оплате</span>
+      <span class="info-row-value accent" id="sumPrice">—</span>
+    </div>
+  </div>
+
+  <!-- Реквизиты -->
+  <div class="pay-card">
+    <div class="pay-bank-row">
+      <div class="pay-bank-icon">🏦</div>
+      <div>
+        <div class="pay-bank-name">Оплату Сюда</div>
+        <div class="pay-bank-sub">МоноБанк</div>
+      </div>
+    </div>
+    <div class="card-num-row">
+      <span class="card-num" id="cardNumber">4441 1144 3776 1180</span>
+      <button class="copy-btn" onclick="copyCard()">Копировать</button>
+    </div>
+    <div class="amount-row">
+      <span class="amount-label">Переведи точно</span>
+      <span class="amount-value" id="payAmount">—</span>
+    </div>
+  </div>
+
+  <!-- Предупреждение -->
+  <div class="warn-box">
+    <span class="warn-icon">⚠️</span>
+    <span>Переведи точную сумму. После оплаты прикрепи скриншот чека — это ускорит обработку заказа.</span>
+  </div>
+
+  <!-- Чек -->
+  <div class="upload-zone" id="receiptUpload">
+    <input type="file" id="receiptFile" accept="image/*" onchange="handleReceipt(this)" />
+    <div class="receipt-img-preview" id="receiptImgPreview">
+      <img id="receiptImg" src="" alt="" />
+    </div>
+    <div class="upload-icon">📎</div>
+    <div class="upload-text">Прикрепи скриншот чека</div>
+    <div class="upload-sub">PNG, JPG до 10MB</div>
+    <div class="receipt-file-preview" id="receiptFilePreview">
+      <span>✅</span><span id="receiptFileName"></span>
+    </div>
+  </div>
+
+  <div class="spacer"></div>
+</div>
+
+<!-- ====== SCREEN SUCCESS ====== -->
+<div class="screen" id="screenSuccess">
+  <div class="success-wrap">
+    <div class="success-circle">✓</div>
+    <div class="success-title">Заявка принята!</div>
+    <div class="success-desc">Администратор проверит оплату и выдаст донат в течение 5–30 минут.</div>
+    <div class="order-num-box">
+      <div class="order-num-label">Номер заказа</div>
+      <div class="order-num-value" id="orderId">#0001</div>
+    </div>
+    <div class="contact-box">
+      <span>📩</span>
+      <span>Ожидай сообщения от администратора. Если ответа нет более 30 минут — напиши <b>@fleyb1</b></span>
+    </div>
+    <button class="btn-secondary" onclick="resetApp()">Новый заказ</button>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <div class="nav-item active" onclick="showNav('catalog')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+    Каталог
+  </div>
+  <div class="nav-item" onclick="showNav('orders')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+    Заказы
+  </div>
+  <div class="nav-item" onclick="showNav('info')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    Инфо
+  </div>
+</div>
+
+<!-- BOTTOM ACTION (fixed) -->
+<div class="bottom-action" id="bottomAction">
+  <button class="btn-main" id="btnAction" onclick="handleAction()" disabled>Выбери услугу</button>
+</div>
+
+<script>
+const CONFIG = {
+  cardNumber: '4441 1144 3776 1180',
+  adminUsername: '@fleyb1',
+};
+
+const SERVICES = [
+  { id: 'baron',  icon: '🩵', name: 'Барон',  cat: 'Привилегии', type: 'period', desc: 'Привилегия Барон',  periods: [{ label: '30 дней', price: 30, priceStr: '30 ₴' }, { label: '90 дней', price: 54, priceStr: '54 ₴' }, { label: 'Навсегда', price: 84, priceStr: '84 ₴' }] },
+  { id: 'strazh', icon: '🟡', name: 'Страж',  cat: 'Привилегии', type: 'period', desc: 'Привилегия Страж',  periods: [{ label: '30 дней', price: 54, priceStr: '54 ₴' }, { label: '90 дней', price: 90, priceStr: '90 ₴' }, { label: 'Навсегда', price: 144, priceStr: '144 ₴' }] },
+  { id: 'hero',   icon: '🟢', name: 'Герой',  cat: 'Привилегии', type: 'period', desc: 'Привилегия Герой',  periods: [{ label: '30 дней', price: 84, priceStr: '84 ₴' }, { label: '90 дней', price: 108, priceStr: '108 ₴' }, { label: 'Навсегда', price: 180, priceStr: '180 ₴' }] },
+  { id: 'aspid',  icon: '🔵', name: 'Аспид',  cat: 'Привилегии', type: 'period', desc: 'Привилегия Аспид',  periods: [{ label: '30 дней', price: 108, priceStr: '108 ₴' }, { label: '90 дней', price: 180, priceStr: '180 ₴' }, { label: 'Навсегда', price: 300, priceStr: '300 ₴' }] },
+  { id: 'skvid',  icon: '🩵', name: 'Сквид',  cat: 'Привилегии', type: 'period', desc: 'Привилегия Сквид',  periods: [{ label: '30 дней', price: 168, priceStr: '168 ₴' }, { label: '90 дней', price: 300, priceStr: '300 ₴' }, { label: 'Навсегда', price: 540, priceStr: '540 ₴' }] },
+  { id: 'glava',  icon: '🟠', name: 'Глава',  cat: 'Привилегии', type: 'period', desc: 'Привилегия Глава',  periods: [{ label: '30 дней', price: 228, priceStr: '228 ₴' }, { label: '90 дней', price: 420, priceStr: '420 ₴' }, { label: 'Навсегда', price: 780, priceStr: '780 ₴' }] },
+  { id: 'elita',  icon: '🟣', name: 'Элита',  cat: 'Привилегии', type: 'period', desc: 'Привилегия Элита',  periods: [{ label: '30 дней', price: 348, priceStr: '348 ₴' }, { label: '90 дней', price: 588, priceStr: '588 ₴' }, { label: 'Навсегда', price: 1080, priceStr: '1080 ₴' }] },
+  { id: 'titan',  icon: '🔴', name: 'Титан',  cat: 'Привилегии', type: 'period', desc: 'Привилегия Титан',  periods: [{ label: '30 дней', price: 468, priceStr: '468 ₴' }, { label: '90 дней', price: 840, priceStr: '840 ₴' }, { label: 'Навсегда', price: 1440, priceStr: '1440 ₴' }] },
+  { id: 'prince', icon: '🟡', name: 'Принц',  cat: 'Привилегии', type: 'period', desc: 'Привилегия Принц',  periods: [{ label: '30 дней', price: 588, priceStr: '588 ₴' }, { label: '90 дней', price: 1080, priceStr: '1080 ₴' }, { label: 'Навсегда', price: 1980, priceStr: '1980 ₴' }] },
+  { id: 'knyaz',  icon: '🔷', name: 'Князь',  cat: 'Привилегии', type: 'period', desc: 'Привилегия Князь',  periods: [{ label: '30 дней', price: 900, priceStr: '900 ₴' }, { label: '90 дней', price: 1440, priceStr: '1440 ₴' }, { label: 'Навсегда', price: 2640, priceStr: '2640 ₴' }] },
+  { id: 'hercog', icon: '💜', name: 'Герцог', cat: 'Привилегии', type: 'period', desc: 'Привилегия Герцог', periods: [{ label: '30 дней', price: 1900, priceStr: '1900 ₴' }, { label: '90 дней', price: 2880, priceStr: '2880 ₴' }, { label: 'Навсегда', price: 5280, priceStr: '5280 ₴' }] },
+  { id: 'tokens', icon: '💎', name: 'Токены', cat: 'Валюта', type: 'quantity', desc: '1 ₴ = 100 токенов', rateLabel: '1 ₴ = 100 токенов', unit: 'токенов', ratePerUnit: 100, pricePerUnit: 1, minQty: 15000, minLabel: 'Минимум 15 000 токенов = 150 ₴' },
+  { id: 'birzha', icon: '🪙', name: 'Биржа Баланс', cat: 'Валюта', type: 'quantity', desc: '1 ₴ = 1 баланс', rateLabel: '1 ₴ = 1 баланс', unit: 'баланса', ratePerUnit: 1, pricePerUnit: 1, minQty: 200, minLabel: 'Минимум 200 баланса = 200 ₴' },
+  { id: 'key_obych',  icon: '🗝️', name: 'Обычный Ключ',    cat: 'Ключи', type: 'count', desc: 'Обычный ключ',          price: 6,  priceStr: '6 ₴/шт',  minCount: 1 },
+  { id: 'key_monet',  icon: '🔑', name: 'Монетный Ключ',   cat: 'Ключи', type: 'count', desc: 'Монетный ключ',         price: 6,  priceStr: '6 ₴/шт',  minCount: 1 },
+  { id: 'key_token',  icon: '💚', name: 'Токен Ключ',      cat: 'Ключи', type: 'count', desc: 'Токен ключ',            price: 12, priceStr: '12 ₴/шт', minCount: 1 },
+  { id: 'key_instr',  icon: '🔧', name: 'Инструм. Ключ',   cat: 'Ключи', type: 'count', desc: 'Инструментальный ключ', price: 12, priceStr: '12 ₴/шт', minCount: 1 },
+  { id: 'key_weapon', icon: '⚔️', name: 'Оружейный Ключ',  cat: 'Ключи', type: 'count', desc: 'Оружейный ключ',        price: 12, priceStr: '12 ₴/шт', minCount: 1 },
+  { id: 'key_armor',  icon: '🛡️', name: 'Броневой Ключ',   cat: 'Ключи', type: 'count', desc: 'Броневой ключ',         price: 12, priceStr: '12 ₴/шт', minCount: 1 },
+  { id: 'key_donat',  icon: '🌟', name: 'Донат Ключ',      cat: 'Ключи', type: 'count', desc: 'Донат ключ',            price: 84, priceStr: '84 ₴/шт', minCount: 1 },
+  { id: 'donat_case', icon: '📦', name: 'Донат-кейс',      cat: 'Ключи', type: 'count', desc: 'от 2 шт',              price: 84, priceStr: '84 ₴/шт', minCount: 2, minLabel: 'Минимум 2 кейса = 168 ₴' },
+  { id: 'razmut', icon: '🔊', name: 'Размут',  cat: 'Прочее', type: 'fixed', desc: 'Снять мут с аккаунта', price: 30,  priceStr: '30 ₴'  },
+  { id: 'razban', icon: '🔓', name: 'Разбан',  cat: 'Прочее', type: 'fixed', desc: 'Разбан аккаунта',      price: 150, priceStr: '150 ₴' },
+];
+
+const tg = window.Telegram?.WebApp;
+if (tg) { tg.expand(); tg.ready(); }
+
+let state = {
+  nickname: '', serviceId: null, period: null, qty: 0,
+  finalPrice: 0, finalPriceStr: '', finalDesc: '',
+  receiptFile: null, currentCat: null, currentScreen: 'catalog'
+};
+
+// ---- INIT ----
+const cats = [...new Set(SERVICES.map(s => s.cat))];
+state.currentCat = cats[0];
+
+function init() {
+  renderCatTabs();
+  renderServiceList();
+}
+
+function renderCatTabs() {
+  const el = document.getElementById('catTabs');
+  el.innerHTML = cats.map(c => `
+    <div class="cat-tab ${c === state.currentCat ? 'active' : ''}" onclick="switchCat('${c}')">${c}</div>
+  `).join('');
+}
+
+function switchCat(cat) {
+  state.currentCat = cat;
+  state.serviceId = null;
+  state.finalPrice = 0;
+  document.getElementById('serviceOptions').style.display = 'none';
+  updateBtn();
+  renderCatTabs();
+  renderServiceList();
+}
+
+function renderServiceList() {
+  const el = document.getElementById('serviceList');
+  const list = SERVICES.filter(s => s.cat === state.currentCat);
+  el.innerHTML = list.map(s => `
+    <div class="svc-item ${state.serviceId === s.id ? 'selected' : ''}" id="svc_${s.id}" onclick="selectService('${s.id}')">
+      <span class="svc-icon">${s.icon}</span>
+      <div class="svc-info">
+        <div class="svc-name">${s.name}</div>
+        <div class="svc-desc">${s.desc}</div>
+      </div>
+      <div class="svc-right">
+        <div class="svc-price">${s.type === 'period' ? 'от ' + s.periods[0].priceStr : s.priceStr || s.rateLabel}</div>
+      </div>
+      <div class="svc-check"><svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+    </div>
+  `).join('');
+}
+
+function selectService(id) {
+  state.serviceId = id;
+  state.period = null; state.qty = 0; state.finalPrice = 0;
+  renderServiceList();
+  const svc = SERVICES.find(s => s.id === id);
+  renderOptions(svc);
+  updateBtn();
+}
+
+function renderOptions(svc) {
+  const el = document.getElementById('serviceOptions');
+
+  if (svc.type === 'period') {
+    el.style.display = 'block';
+    el.innerHTML = `
+      <div class="options-panel">
+        <div class="options-label">Выбери срок</div>
+        <div class="period-row">
+          ${svc.periods.map((p, i) => `
+            <div class="period-btn" id="period_${i}" onclick="selectPeriod(${i})">
+              <div class="period-days">${p.label}</div>
+              <div class="period-price">${p.priceStr}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>`;
+
+  } else if (svc.type === 'quantity') {
+    el.style.display = 'block';
+    el.innerHTML = `
+      <div class="options-panel">
+        <div class="options-label">Количество</div>
+        <div class="qty-hint">${svc.minLabel}</div>
+        <div class="qty-row">
+          <input type="number" class="qty-input" id="qtyInput" placeholder="Напр. ${svc.minQty}" min="${svc.minQty}" oninput="calcQty('${svc.id}')" />
+          <div class="qty-total" id="qtyTotal">— ₴</div>
+        </div>
+      </div>`;
+
+  } else if (svc.type === 'count') {
+    const min = svc.minCount || 1;
+    el.style.display = 'block';
+    el.innerHTML = `
+      <div class="options-panel">
+        <div class="options-label">Количество штук</div>
+        ${svc.minLabel ? `<div class="qty-hint">${svc.minLabel}</div>` : ''}
+        <div class="qty-row">
+          <input type="number" class="qty-input" id="qtyInput" placeholder="Кол-во" min="${min}" value="${min}" oninput="calcCount('${svc.id}')" />
+          <div class="qty-total" id="qtyTotal">${svc.price * min} ₴</div>
+        </div>
+      </div>`;
+    state.qty = min;
+    state.finalPrice = svc.price * min;
+    state.finalPriceStr = `${svc.price * min} ₴`;
+    state.finalDesc = `${svc.name} x${min}`;
+    updateBtn();
+
+  } else {
+    el.style.display = 'none';
+    state.finalPrice = svc.price;
+    state.finalPriceStr = svc.priceStr;
+    state.finalDesc = svc.name;
+    updateBtn();
+  }
+}
+
+function selectPeriod(idx) {
+  const svc = SERVICES.find(s => s.id === state.serviceId);
+  document.querySelectorAll('.period-btn').forEach((b, i) => b.classList.toggle('active', i === idx));
+  const p = svc.periods[idx];
+  state.period = p.label;
+  state.finalPrice = p.price;
+  state.finalPriceStr = p.priceStr;
+  state.finalDesc = `${svc.name} — ${p.label}`;
+  updateBtn();
+}
+
+function calcQty(id) {
+  const svc = SERVICES.find(s => s.id === id);
+  const val = parseInt(document.getElementById('qtyInput').value) || 0;
+  const price = Math.ceil((val / svc.ratePerUnit) * svc.pricePerUnit);
+  document.getElementById('qtyTotal').textContent = val >= svc.minQty ? price + ' ₴' : '— ₴';
+  if (val >= svc.minQty) {
+    state.finalPrice = price; state.finalPriceStr = price + ' ₴';
+    state.finalDesc = `${svc.name} — ${val.toLocaleString()} ${svc.unit}`;
+    updateBtn();
+  } else { state.finalPrice = 0; updateBtn(); }
+}
+
+function calcCount(id) {
+  const svc = SERVICES.find(s => s.id === id);
+  const min = svc.minCount || 1;
+  const val = parseInt(document.getElementById('qtyInput').value) || 0;
+  const price = svc.price * val;
+  document.getElementById('qtyTotal').textContent = val >= min ? price + ' ₴' : '— ₴';
+  if (val >= min) {
+    state.finalPrice = price; state.finalPriceStr = price + ' ₴';
+    state.finalDesc = `${svc.name} x${val}`;
+    updateBtn();
+  } else { state.finalPrice = 0; updateBtn(); }
+}
+
+function updateBtn() {
+  const btn = document.getElementById('btnAction');
+  if (state.currentScreen === 'catalog') {
+    const nick = document.getElementById('nicknameInput').value.trim();
+    const ready = nick && state.finalPrice > 0;
+    btn.disabled = !ready;
+    btn.textContent = ready ? `Перейти к оплате — ${state.finalPriceStr}` : 'Выбери услугу';
+  } else if (state.currentScreen === 'payment') {
+    btn.disabled = false;
+    btn.textContent = '✅ Я оплатил!';
+  }
+}
+
+function handleAction() {
+  if (state.currentScreen === 'catalog') goToPayment();
+  else if (state.currentScreen === 'payment') submitOrder();
+}
+
+function goToPayment() {
+  const nick = document.getElementById('nicknameInput').value.trim();
+  if (!nick) { document.getElementById('nicknameInput').classList.add('error'); return; }
+  state.nickname = nick;
+  document.getElementById('sumNick').textContent = nick;
+  const svc = SERVICES.find(s => s.id === state.serviceId);
+  document.getElementById('sumService').textContent = svc.icon + ' ' + state.finalDesc;
+  document.getElementById('sumPrice').textContent = state.finalPriceStr;
+  document.getElementById('payAmount').textContent = state.finalPriceStr;
+  state.currentScreen = 'payment';
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screenPayment').classList.add('active');
+  updateBtn();
+  window.scrollTo(0, 0);
+}
+
+function goBack() {
+  state.currentScreen = 'catalog';
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screenCatalog').classList.add('active');
+  updateBtn();
+  window.scrollTo(0, 0);
+}
+
+function submitOrder() {
+  if (!state.receiptFile) { showToast('Прикрепи чек! 📎'); return; }
+  let orderNum = parseInt(localStorage.getItem('fs_order_count') || '0') + 1;
+  localStorage.setItem('fs_order_count', orderNum);
+  const orderId = '#' + String(orderNum).padStart(4, '0');
+  document.getElementById('orderId').textContent = orderId;
+  if (tg) {
+    tg.sendData(JSON.stringify({ orderId, nickname: state.nickname, server: 'Анархия', service: state.finalDesc, price: state.finalPriceStr }));
+  }
+  state.currentScreen = 'success';
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screenSuccess').classList.add('active');
+  document.getElementById('bottomAction').style.display = 'none';
+  window.scrollTo(0, 0);
+}
+
+function resetApp() {
+  state = { nickname: '', serviceId: null, period: null, qty: 0, finalPrice: 0, finalPriceStr: '', finalDesc: '', receiptFile: null, currentCat: cats[0], currentScreen: 'catalog' };
+  document.getElementById('nicknameInput').value = '';
+  document.getElementById('nicknameInput').classList.remove('error');
+  document.getElementById('serviceOptions').style.display = 'none';
+  document.getElementById('receiptUpload').classList.remove('has-file');
+  document.getElementById('receiptImgPreview').style.display = 'none';
+  document.getElementById('receiptFilePreview').style.display = 'none';
+  document.getElementById('receiptFile').value = '';
+  document.getElementById('bottomAction').style.display = 'block';
+  renderCatTabs(); renderServiceList(); updateBtn();
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screenCatalog').classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function showNav(tab) {
+  if (tab === 'catalog') {
+    if (state.currentScreen === 'success') resetApp();
+    else { goBack(); }
+  } else if (tab === 'orders') {
+    showToast('Раздел в разработке');
+  } else if (tab === 'info') {
+    showToast('⚔️ Сервер: Анархия | @fleyb1');
+  }
+}
+
+function copyCard() {
+  const num = CONFIG.cardNumber.replace(/\s/g, '');
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(num).then(() => showToast('Номер скопирован ✅')).catch(() => fallbackCopy(num));
+  } else { fallbackCopy(num); }
+}
+
+function fallbackCopy(text) {
+  const el = document.createElement('textarea');
+  el.value = text;
+  el.style.cssText = 'position:fixed;left:-9999px;top:-9999px';
+  document.body.appendChild(el);
+  el.focus(); el.select();
+  try { document.execCommand('copy'); showToast('Номер скопирован ✅'); }
+  catch(e) { showToast('Скопируй: ' + text); }
+  document.body.removeChild(el);
+}
+
+function handleReceipt(input) {
+  const file = input.files[0];
+  if (!file) return;
+  state.receiptFile = file;
+  const zone = document.getElementById('receiptUpload');
+  zone.classList.add('has-file');
+  document.getElementById('receiptFileName').textContent = file.name;
+  if (file.type.startsWith('image/')) {
+    const reader = new FileReader();
+    reader.onload = e => {
+      document.getElementById('receiptImg').src = e.target.result;
+      document.getElementById('receiptImgPreview').style.display = 'block';
+      document.getElementById('receiptFilePreview').style.display = 'none';
+    };
+    reader.readAsDataURL(file);
+  } else {
+    document.getElementById('receiptImgPreview').style.display = 'none';
+    document.getElementById('receiptFilePreview').style.display = 'flex';
+  }
+}
+
+function showToast(msg) {
+  const el = document.createElement('div');
+  el.className = 'toast'; el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 2100);
+}
+
+document.getElementById('nicknameInput').addEventListener('input', () => {
+  document.getElementById('nicknameInput').classList.remove('error');
+  updateBtn();
+});
+
+init();
+</script>
+</body>
+</html>
